@@ -1,30 +1,33 @@
 <?php
- $server = "localhost";
- $username = "root";
- $password = "";
- $dbname = "forma";
+$server = "localhost";
+$username = "root";
+$password = "";
+$dbname = "forma";
 
- $conn = mysqli_connect($server, $username, $password, $dbname);
+$conn = mysqli_connect($server, $username, $password, $dbname);
 
- if(isset($_POST['submit'])){
-     if(!empty($_POST['firstName']) && !empty($_POST['email']) && !empty($_POST['project']) && !empty($_POST['message'])){
-         $firstName = $_POST['firstName'];
-         $email = $_POST['email'];
-         $project = $_POST['project'];
-         $message = $_POST['message'];
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-         $query = "insert into form ( name, email, project, message) values('$firstName' , '$email' , '$project' , '$message')";
+if (isset($_POST['submit'])) {
+    $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $project = mysqli_real_escape_string($conn, $_POST['project']);
+    $message = mysqli_real_escape_string($conn, $_POST['message']);
 
-         $run = mysqli_query($conn,$query) or die(mysqli_error());
+    if (!empty($firstName) && !empty($email) && !empty($project) && !empty($message)) {
+        $query = "INSERT INTO form (name, email, project, message) VALUES ('$firstName', '$email', '$project', '$message')";
 
-         if($run){
-             echo"Form submitted successfully";
-         }else{
-             echo"Form not submitted";
-         }
+        if (mysqli_query($conn, $query)) {
+            echo "Form submitted successfully";
+        } else {
+            echo "Form not submitted: " . mysqli_error($conn);
+        }
+    } else {
+        echo "All fields are required";
+    }
+}
 
-     }else{
-         echo"all fields required";
-     }
- }
-
+mysqli_close($conn);
+?>
